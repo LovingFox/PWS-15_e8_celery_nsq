@@ -1,0 +1,6 @@
+gnsq==1.0.2
+Flask-SQLAlchemy==2.4.4
+celery==5.0.2
+requests==2.24.0
+redis==3.5.3
+psycopg2==2.8.6

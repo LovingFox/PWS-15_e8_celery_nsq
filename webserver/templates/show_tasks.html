@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang = "en">
+   <head>
+	<style>
+	table, td, th {
+	  border: 1px solid black;
+	}
+
+	table {
+	  width: 100%;
+	  border-collapse: collapse;
+	}
+	</style>
+   </head>
+   <body>
+      {%- for message in get_flashed_messages() %}
+         {{ message }}
+      {%- endfor %}
+
+      <form action = "{{ request.path }}" method = "post">
+         <label for = "address">Site</label><br>
+         <input type = "text" name = "address" placeholder = "www.site.com" /><br>
+         <input type = "submit" value = "Submit" />
+      </form>
+
+   
+      <table>
+         <thead>
+            <tr>
+               <th>Id</th>
+               <th>Site</th>
+               <th>DateTime</th>
+               <th>Status</th>
+               <th>Result</th>
+            </tr>
+         </thead>
+         
+         <tbody>
+            {% for task in tasks %}
+               <tr>
+                  <td>{{ task.id }}</td>
+                  <td>{{ task.address }}</td>
+                  <td>{{ task.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                  <td>{{ task.task_status.name }}</td>
+                  <td>{{ task.result }}</td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+      
+   </body>
+</html>

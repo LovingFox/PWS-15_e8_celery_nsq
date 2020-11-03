@@ -1,0 +1,48 @@
+version: '3'
+services:
+  nsqlookupd:
+    image: nsqio/nsq:v1.2.0
+    command: /nsqlookupd
+  nsqd:
+    image: nsqio/nsq:v1.2.0
+    command: /nsqd --lookupd-tcp-address=nsqlookupd:4160 --broadcast-address=nsqlookupd
+    depends_on:
+      - nsqlookupd
+  nsqadmin:
+    image: nsqio/nsq:v1.2.0
+    command: /nsqadmin --lookupd-http-address=nsqlookupd:4161
+    depends_on:
+      - nsqlookupd  
+    ports:
+      - "4171:4171"
+  redis_server:
+    image: redis:6.0.8-alpine
+  postgress_server:
+    image: postgres:9.5-alpine
+    environment:
+      - POSTGRES_DB=tasks
+      - POSTGRES_PASSWORD=password
+  worker:
+    build: './worker'
+    environment:
+      - REDIS_HOST=redis_server
+      - NSQ_HTTP_HOST=nsqd
+      - NSQ_TOPIC=counter
+    depends_on:
+      - nsqlookupd
+      - redis_server
+  webserver:
+    build:
+      context: .
+      dockerfile: ./webserver/Dockerfile
+    environment:
+      - REDIS_HOST=redis_server
+      - NSQ_HTTP_HOST=nsqd
+      - NSQ_TOPIC=counter
+      - SQLALCHEMY_DATABASE_URI=postgres://postgres:password@postgress_server/tasks
+    depends_on:
+      - postgress_server
+      - nsqlookupd
+      - redis_server
+    ports:
+      - "5000:5000"
